@@ -5,7 +5,7 @@ const express = require('express');
 const morgan = require('morgan');
 const courseRoute = require('./routes/courseRoute');
 const userRoute = require('./routes/userRoute');
-const sequelize = require('./models').sequelize;
+const database = require('./models').sequelize;
 const dbName = require('./config/config.json').development.storage;
 
 // variable to enable global error logging
@@ -17,7 +17,7 @@ const app = express();
 // test database connection
 (async () => {
   try {
-    await sequelize.authenticate();
+    await database.authenticate();
     console.log(`Successfully connected to ${dbName}`);
   } catch (error) {
     console.error(`Unable to connect to ${dbName}: `, error);

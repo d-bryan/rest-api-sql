@@ -64,7 +64,7 @@ const authenticateUser = async(req, res, next) => {
     console.warn(message);
 
     // Return a status of 403 Unauthorized
-    res.status(403).json({ message: 
+    res.status(401).json({ message: 
       {
         developer: 'Access Denied, authentication failure.',
         client: 'You must type in your username and password to gain access.'

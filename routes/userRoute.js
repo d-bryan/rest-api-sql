@@ -16,8 +16,11 @@ router.get('/users', MW.authenticateUser, MW.asyncHandler(async (req, res) => {
   const user = req.currentUser;
 
   await res.json({
-    name: `${user.firstName} ${user.lastName}`,
-    email: user.emailAddress
+    currentUser: {
+      firstName: `${user.firstName}`,
+      lastName: `${user.lastName}`,
+      email: user.emailAddress
+    }
   });
 }));
 
@@ -32,6 +35,7 @@ router.post('/users', MW.userCheck, MW.asyncHandler(async (req, res) => {
       const errorMessages = errors.array().map(error => error.msg);
 
       res.status(400).json({ errors: errorMessages });
+    
     } else {
       // GET the user from the request body
       const user = req.body;
@@ -46,6 +50,9 @@ router.post('/users', MW.userCheck, MW.asyncHandler(async (req, res) => {
         emailAddress: user.emailAddress,
         password: user.password,
       });
+
+      // set the location header for the URI
+      res.location('/');
 
       // Send the status of 201 for newly created user
       res.status(201).end();

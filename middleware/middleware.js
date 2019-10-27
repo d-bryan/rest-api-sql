@@ -57,19 +57,14 @@ const authenticateUser = async(req, res, next) => {
       message = `User not found for username: ${credentials.name}`;
     }
   } else {
-    message = 'Auth header not found';
+    message = 'Please enter your username and password';
   }
   // If user authentication failed, display the message
   if (message) {
     console.warn(message);
 
-    // Return a status of 403 Unauthorized
-    res.status(401).json({ message: 
-      {
-        developer: 'Access Denied, authentication failure.',
-        client: 'You must type in your username and password to gain access.'
-      } 
-    });
+    // Return a status of 401 Unauthorized
+    res.status(400).json({ message: message });
   } else {
     next();
   }

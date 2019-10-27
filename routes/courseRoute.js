@@ -72,7 +72,7 @@ router.post('/courses', MW.courseCheck, MW.asyncHandler(async (req, res) => {
 }));
 
 // PUT /api/courses/:id (204) - Updates a course and returns no content
-router.put('/courses/:id', MW.authenticateUser, MW.asyncHandler(async (req, res, next) => {
+router.put('/courses/:id', MW.authenticateUser, MW.asyncHandler(async (req, res) => {
   const request = req.body;
   const user = req.currentUser;
   const course = await Course.findByPk(req.params.id);

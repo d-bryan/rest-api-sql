@@ -55,7 +55,6 @@ router.post('/courses', MW.authenticateUser, MW.courseCheck, MW.asyncHandler(asy
   const user = req.currentUser;
   const createCourse = await Course.create(request);
 
-  // console.log(request);
 
   if (user) {
     
@@ -142,8 +141,8 @@ router.delete('/courses/:id', MW.authenticateUser, MW.asyncHandler(async (req, r
     try {
       // If the course exists => proceed
       if (course) {
-
-        if (course.id === user.id) {
+        // If the course userId matches the users ID => proceed
+        if (course.userId === user.id) {
           // DELETE the course and end cycle
           await course.destroy();
           res.status(204).end();

@@ -14,7 +14,27 @@ function asyncHandler(cb){
     try {
       await cb(req, res, next)
     } catch(error){
-      res.status(500).send(error);
+      if (error.name === 'SequelizeUniqueConstraintError') {
+        // Send message back to client
+        res.status(400).json({
+          message: {
+            developer: error.name,
+            client: `${error.errors[0].message}, please enter another email address (${error.errors[0].instance.emailAddress}) is already taken.`
+          },
+          errors: error.errors.map(err => err.message),
+        });
+      } else if(error.name === 'SequelizeValidationError') {
+        // Send message back to client
+        res.status(400).json({
+          message: {
+            developer: error.name,
+            client: `Please fill is a value for the following items: ${error.errors.map(err => err.path)}`
+          },
+          errors: error.errors.map(err => err.message),
+        });
+      } else {
+        res.status(500).send(error);
+      }
     }
   }
 }

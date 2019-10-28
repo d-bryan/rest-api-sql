@@ -26,8 +26,6 @@ router.get('/users', MW.authenticateUser, MW.asyncHandler(async (req, res) => {
 
 // POST /api/users (201) - Creates a user, sets the Location header to "/" and returns no content
 router.post('/users', MW.userCheck, MW.asyncHandler(async (req, res) => {
-
-
   try {
     // Attempt to get the validation result from request body.
     const errors = validationResult(req);
@@ -74,7 +72,6 @@ router.post('/users', MW.userCheck, MW.asyncHandler(async (req, res) => {
       res.status(500).send(error);
     }
   }
-    
 }));
 
 module.exports = router;

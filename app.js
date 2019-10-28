@@ -49,13 +49,37 @@ app.use((req, res) => {
 });
 
 // setup a global error handler
-app.use((err, req, res, next) => {
+app.use((error, req, res, next) => {
   if (enableGlobalErrorLogging) {
-    console.error(`Global error handler: ${JSON.stringify(err.stack)}`);
+    console.error(`Global error handler: ${JSON.stringify(error.stack)}`);
   }
 
-  res.status(err.status || 500).json({
-    message: err.message,
+  // if (error.message === 'SequelizeUniqueConstraintError') {
+  //   // Send message back to client
+  //   res.status(400).json({
+  //     errors: {
+  //       developer: error.errors[0].type,
+  //       client: `${error.errors[0].message}, please enter another email address (${error.errors[0].instance.emailAddress}) is already taken.`
+  //     },
+  //   });
+  // } else if(error.message === 'SequelizeValidationError') {
+  //   // Send message back to client
+  //   res.status(400).json({
+  //     fullErrorList: error,
+  //     errors: {
+  //       developer: error.errors[0].type,
+  //       client: `${error.errors[0].message}, please enter another email address (${error.errors[0].instance.emailAddress}) is already taken.`
+  //     },
+  //   });
+  // } else {
+  //   res.status(error.status || 500).json({
+  //     message: error.message,
+  //     error: {},
+  //   });
+  // }
+
+  res.status(error.status || 500).json({
+    message: error.message,
     error: {},
   });
 });

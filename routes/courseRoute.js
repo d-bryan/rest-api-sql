@@ -82,7 +82,7 @@ router.post('/courses', MW.authenticateUser, MW.courseCheck, MW.asyncHandler(asy
     res.status(403).json({ message: 
       {
         developer: 'Forbidden, unauthorized user access',
-        client: 'The user information that you entered does not match what we have in our records for the owner of this course.'
+        client: 'Please login first to create a new course.'
       } 
     });
   }

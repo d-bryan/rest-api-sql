@@ -4,8 +4,11 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon ./app.js",
+    "start": "node ./app.js",
     "seed": "cross-env DB_ENABLE_LOGGING=true node './seed'"
+  },
+  "engines": {
+    "node": "^12.13.0"
   },
   "keywords": [
     "REST",

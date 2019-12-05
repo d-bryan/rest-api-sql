@@ -40,7 +40,13 @@ router.get('/courses/:id', MW.asyncHandler(async (req, res) => {
     }]
   });
 
-  res.status(200).json(course);
+  if (course === null) {
+    res.status(404).json({
+      message: 'Sorry we cannot find that course.'
+    });
+  } else {
+    res.status(200).json(course);
+  }
 
 }));
 
@@ -69,7 +75,7 @@ router.post('/courses', MW.authenticateUser, MW.courseCheck, MW.asyncHandler(asy
         createCourse;
 
         // set the location header for the URI
-        res.location(`/api/courses/${createCourse.id}`);
+        res.location(`/courses/${createCourse.id}`);
 
         // Send the status of 201 for newly created user
         res.status(201).end();
@@ -79,20 +85,22 @@ router.post('/courses', MW.authenticateUser, MW.courseCheck, MW.asyncHandler(asy
     }
   } else {
     // If User is not authenticated send 403 status and message back to client
-    res.status(403).json({ message: 
-      {
-        developer: 'Forbidden, unauthorized user access',
-        client: 'Please login first to create a new course.'
-      } 
+    res.status(403).json({ 
+      message: 
+        'Please login first to create a new course.'
     });
   }
 }));
 
 // PUT /api/courses/:id (204) - Updates a course and returns no content
-router.put('/courses/:id', MW.authenticateUser, MW.asyncHandler(async (req, res) => {
+router.put('/courses/:id', MW.authenticateUser, MW.courseUpdateCheck, MW.asyncHandler(async (req, res) => {
   const request = req.body;
   const user = req.currentUser;
   const course = await Course.findByPk(req.params.id);
+
+  const errors = validationResult(req);
+  const errorMessages = errors.array().map(error => error.msg);
+  console.log(errorMessages);
 
     // If User is authenticated => proceed
     if (user && user.id === course.userId) {
@@ -100,11 +108,9 @@ router.put('/courses/:id', MW.authenticateUser, MW.asyncHandler(async (req, res)
       if (request.title && request.description) {
         // If the course does not exist then sent 404 back to client
         if (course === null) {
-          res.status(404).json({ message: 
-            {
-              developer: 'The course does not exist.',
-              client: 'The course that you are looking for cannot be found...'
-            } 
+          res.status(404).json({ 
+            message: 
+              'The course that you are looking for cannot be found...'
           });
         } else {
           // update the course if exists with request data
@@ -112,21 +118,17 @@ router.put('/courses/:id', MW.authenticateUser, MW.asyncHandler(async (req, res)
           res.status(204).end();
         }
       } else {
-        // If all necessary compenents were not entered send bad request status
-        res.status(400).json({ message:  
-          {
-            developer: 'Bad request, missing necessary information "Title" and "Descritpion" are required.',
-            client: 'Please ensure that you filled out all required fields, (Title) and (Description) are required to update.'
-          } 
-        });
+
+        if (!errors.isEmpty()) {
+          // If all necessary compenents were not entered send bad request status
+          res.status(400).json({ errors: errorMessages });
+        }
       }
     } else {
       // If User is not authenticated send 403 status and message back to client
-      res.status(403).json({ message: 
-        {
-          developer: 'Forbidden, unauthorized user access',
-          client: 'The user information that you entered does not match what we have in our records for the owner of this course.'
-        } 
+      res.status(403).json({ 
+        message: 
+           'The user information that you entered does not match what we have in our records for the owner of this course.' 
       });
     }
 }));
@@ -148,20 +150,16 @@ router.delete('/courses/:id', MW.authenticateUser, MW.asyncHandler(async (req, r
           res.status(204).end();
         } else {
           // if the course DOES NOT belong to the person attempting to delete send 400 response to client
-          res.status(403).json({ message: 
-            {
-              developer: 'Unauthorized deletion attempt.',
-              client: 'The course that you are attempting to delete does not belong to you.'
-            } 
+          res.status(403).json({ 
+            message: 
+              'The course that you are attempting to delete does not belong to you.'
           });
         }
       } else {
         // if the course DOES NOT exist send 404 response to client
-        res.status(404).json({ message: 
-          {
-            developer: 'The course does not exist.',
-            client: 'The course that you are looking for cannot be found...'
-          } 
+        res.status(404).json({ 
+          message:
+           'The course that you are looking for cannot be found...' 
         });
       }
     } catch (error) {
@@ -169,11 +167,9 @@ router.delete('/courses/:id', MW.authenticateUser, MW.asyncHandler(async (req, r
     }
   } else {
     // If User is not authenticated send 403 status and message back to client
-    res.status(403).json({ message: 
-      {
-        developer: 'Forbidden, unauthorized user access',
-        client: 'The user information that you entered does not match what we have in our records for the owner of this course.'
-      } 
+    res.status(403).json({ 
+      message: 
+        'The user information that you entered does not match what we have in our records for the owner of this course.'
     });
   }
 }));

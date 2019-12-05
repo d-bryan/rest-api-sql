@@ -16,16 +16,15 @@ router.get('/users', MW.authenticateUser, MW.asyncHandler(async (req, res) => {
   const user = req.currentUser;
 
   await res.json({
-    currentUser: {
-      firstName: `${user.firstName}`,
-      lastName: `${user.lastName}`,
-      email: user.emailAddress
-    }
+    id: user.id,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    email: user.emailAddress,
   });
 }));
 
 // POST /api/users (201) - Creates a user, sets the Location header to "/" and returns no content
-router.post('/users', MW.userCheck, MW.asyncHandler(async (req, res) => {
+router.post('/users', MW.createUserCheck, MW.asyncHandler(async (req, res) => {
   try {
     // Attempt to get the validation result from request body.
     const errors = validationResult(req);
@@ -63,11 +62,10 @@ router.post('/users', MW.userCheck, MW.asyncHandler(async (req, res) => {
     if(error.name === 'SequelizeUniqueConstraintError') {
       // Send message back to client
       res.status(400).json({
-        errors: {
-          developer: error.errors[0].type,
-          client: `${error.errors[0].message}, please enter another email address (${error.errors[0].instance.emailAddress}) is already taken.`
-        },
-      });
+        errors: [
+          `Username must be unique, please enter another "email address" (${error.errors[0].instance.emailAddress}) is already taken.`
+          ]
+        });
     } else {
       res.status(500).send(error);
     }

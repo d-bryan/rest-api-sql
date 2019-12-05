@@ -106,9 +106,21 @@ const courseCheck = [
 ];
 
 /**
+ * Middleware function to check PUT values before sending for courses
+ */
+const courseUpdateCheck = [
+  check('title')
+    .exists({ checkNull: true, checkFalsy: true })
+    .withMessage('Please provide a value for "Title"'),
+  check('description')
+    .exists({ checkNull: true, checkFalsy: true })
+    .withMessage('Please provide a value for "Description"'),
+];
+
+/**
  * Middleware function to check post values before sending for users
  */
-const userCheck = [
+const createUserCheck = [
   check('firstName')
     .exists({ checkNull: true, checkFalsy: true })
     .withMessage('Please provide a value for "firstName"'),
@@ -132,5 +144,6 @@ module.exports = {
   asyncHandler,
   authenticateUser,
   courseCheck,
-  userCheck
+  courseUpdateCheck,
+  createUserCheck
 };
